@@ -3,6 +3,7 @@
     title="Add connection"
     :visible.sync="dialogVisible"
     width="30%"
+    top="5vh"
     :before-close="void(0)"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -22,7 +23,16 @@
 
       <el-form-item label="Host">
         <el-col>
-          <el-input v-model="db.host" style="width: 85%;" @input="disableSave()" /><el-input-number v-model="db.port" style="width: 15%;" :controls="false" @change="disableSave()" />
+          <el-row>
+            <el-col style="width: 80%;">
+              <el-input v-model="db.host" @input="disableSave()" />
+            </el-col>
+
+            <el-col style="width: 20%;">
+              <el-input v-if="db.port === null" v-model="db.port" :controls="false" style="position: relative; width: 100%;" @change="disableSave()" />
+              <el-input-number v-else v-model="db.port" :controls="false" style="position: relative; width: 100%;" @change="disableSave()" />
+            </el-col>
+          </el-row>
         </el-col>
       </el-form-item>
 
@@ -37,19 +47,22 @@
     <span slot="footer" class="dialog-footer">
       <el-button type="info" style="float: left;" :disabled="!validConnection" :loading="testing" @click="testConnection()">Test connection</el-button>
       <!-- <el-button @click="dialogVisible = false">Cancel</el-button> -->
-      <el-button type="primary" :disabled="!validConnection || !canConnect">Save connection</el-button>
+      <el-button type="primary" :disabled="!validConnection || !canConnect" :loading="saving" @click="saveConnection()">Save connection</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
+import low from 'lowdb'
+import LocalStorage from 'lowdb/adapters/LocalStorage'
+
 export default {
   data () {
     return {
       dialogVisible: true,
       db: {
-        type: '',
-        host: '',
+        type: null,
+        host: null,
         port: null,
         username: '',
         password: ''
@@ -57,6 +70,7 @@ export default {
       name: '',
 
       testing: false,
+      saving: false,
       canConnect: false
     }
   },
@@ -110,6 +124,28 @@ export default {
             message: 'Verifique que el servidor esté activo'
           })
         })
+    },
+
+    saveConnection () {
+      const self = this
+      self.saving = true
+      const adapter = new LocalStorage('db')
+      const db = low(adapter)
+
+      const _connection = self.db
+      _connection.active = true
+      _connection.name = self.name
+
+      db.set('connections', []).write()
+      db.get('connections').push(_connection).write()
+      self.$notify.success({
+        title: 'Correcto',
+        message: 'Conexión guardada'
+      })
+      self.saving = false
+      setTimeout(() => {
+        self.$router.push({ name: 'index' })
+      }, 1500)
     },
 
     disableSave () {
