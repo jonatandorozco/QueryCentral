@@ -1,18 +1,17 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+// import 'element-ui/lib/theme-chalk/index.css'
+import 'element-theme-dark'
 
 export default {
   name: 'Home',
-  components: {
-    HelloWorld
+
+  mounted () {
+    this.$router.push({ name: 'app' })
   }
 }
 </script>
