@@ -46,7 +46,7 @@
     </Form>
     <span slot="footer" class="dialog-footer">
       <Button type="info" style="float: left;" :disabled="!validConnection" :loading="testing" @click="testConnection()">Test connection</Button>
-      <!-- <Button @click="dialogVisible = false">Cancel</Button> -->
+      <Button v-if="hasConnections" @click="() => this.$router.push({ name: 'app' })">Cancel</Button>
       <Button type="primary" :disabled="!validConnection || !canConnect" :loading="saving" @click="saveConnection()">Save connection</Button>
     </span>
   </Dialog>
@@ -74,7 +74,23 @@ export default {
 
       testing: false,
       saving: false,
-      canConnect: false
+      canConnect: false,
+      hasConnections: false
+    }
+  },
+
+  mounted () {
+    const self = this
+    const adapter = new LocalStorage('db')
+    const db = low(adapter)
+    self.internalDb = db
+
+    const _connections = self.internalDb
+      .get('connections')
+      .value()
+
+    if (typeof _connections !== 'undefined') {
+      self.hasConnections = true
     }
   },
 
@@ -132,15 +148,13 @@ export default {
     saveConnection () {
       const self = this
       self.saving = true
-      const adapter = new LocalStorage('db')
-      const db = low(adapter)
 
       const _connection = self.db
       _connection.active = true
       _connection.name = self.name
 
-      db.set('connections', []).write()
-      db.get('connections').push(_connection).write()
+      self.internalDb.set('connections', []).write()
+      self.internalDb.get('connections').push(_connection).write()
       self.$notify.success({
         title: 'Correcto',
         message: 'Conexión guardada'

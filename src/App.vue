@@ -231,4 +231,36 @@ body, button, input, select {
 }
 
 @import url('../public/css/all.css');
+
+.action-button {
+  color: darken(#00adff, 25%);
+
+  &:hover {
+    color: darken(#00adff, 5%);
+  }
+
+  &.action-button-danger {
+    color: darken(red, 25%);
+
+    &:hover {
+      color: darken(red, 5%);
+    }
+  }
+
+  &.action-button-primary {
+    color: darken(orange, 25%);
+
+    &:hover {
+      color: darken(orange, 5%);
+    }
+  }
+
+  &.action-button-secondary {
+    color: darken(green, 10%);
+
+    &:hover {
+      color: lighten(green, 10%);
+    }
+  }
+}
 </style>
