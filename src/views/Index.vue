@@ -1,5 +1,5 @@
 <template>
-  <Container style="height: calc(100vh - 30px); border: 1px solid #eee">
+  <Container style="height: calc(100vh - 30px);">
     <Row style="width: 100vw;">
       <Col>
         <Multipane>
@@ -25,8 +25,16 @@
                   v-else-if="node.level === 5 && node.data.type ==='data:view'"
                   class="fas fa-eye"
                 />
-                <!-- <i v-else class="fas fa-chevron-right" /> -->
                 <span>&nbsp;{{ node.label }}</span>
+                <span v-if="node.level === 1">
+                  <Button
+                    type="text"
+                    size="mini"
+                    @click="() => remove(node, data)"
+                  >
+                    <i class="fas fa-chevron-up"/> Collapse
+                  </Button>
+                </span>
               </span>
             </Tree>
           </Aside>
@@ -43,20 +51,6 @@
                   <span>&times;</span>
                 </MenuItem>
               </Menu>
-              <!-- <Tabs type="border-card" editable>
-                <template v-for="tab in tabs">
-                  <template v-if="tab.type === 'query'">
-                    <TabPane :key="tab.index" :label="tab.title">
-                      <span slot="label"><i class="fas fa-terminal"></i> {{ tab.title }}</span>
-                      <Container>
-                        <MonacoEditor :key="tab.index" theme="vs-dark" class="editor" v-model="code" language="sql" />
-                      </Container>
-                    </TabPane>
-
-                  </template>
-                  <TabPane v-else :key="tab.index" :label="tab.title"></TabPane>
-                </template>
-              </Tabs> -->
             </Main>
           </Container>
         </Multipane>
@@ -75,14 +69,11 @@ import {
   Main,
   Tree,
   Aside,
-  // Header,
   Menu,
   MenuItem,
-  // Submenu,
   Row,
-  Col
-  // Tabs,
-  // TabPane
+  Col,
+  Button
 } from 'element-ui'
 
 export default {
@@ -96,14 +87,11 @@ export default {
     Main,
     Tree,
     Aside,
-    // Header,
     Menu,
     MenuItem,
-    // Submenu,
     Row,
-    Col
-    // Tabs,
-    // TabPane
+    Col,
+    Button
   },
 
   data () {
@@ -142,27 +130,6 @@ export default {
     if (typeof self.selectedConnection === 'undefined') {
       self.$router.push({ name: 'add-connection' })
     }
-
-    // self
-    //   .$axios({
-    //     url: `${self.API_URL}/connection/objects`,
-    //     method: 'POST',
-    //     data: self.selectedConnection
-    //   })
-    //   .then((response) => {
-    //     self.dbObjects = response.data.map((object) => {
-    //       return {
-    //         id: object.id,
-    //         label: object.name,
-    //         type: 'database',
-    //         children: [
-    //           {
-    //             label: 'Tabla'
-    //           }
-    //         ]
-    //       }
-    //     })
-    //   })
   },
 
   methods: {
@@ -272,12 +239,23 @@ export default {
                   response.data.map((table) => {
                     const _table = table
                     _table.noChildren = true
+                    _table.type = 'data:table:details'
                     return _table
                   })
                 )
               })
             break
         }
+      }
+
+      if (node.level === 5) {
+        switch (node.data.type) {
+          case 'data:table:details': {
+            console.log(node)
+          }
+        }
+
+        console.log(node)
       }
     },
 

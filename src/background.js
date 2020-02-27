@@ -16,14 +16,36 @@ const menuTemplate = [
     label: 'Archivo',
     submenu: [
       {
-        label: 'Salir'
+        label: 'Salir',
+        click () {
+          win.close()
+        }
       }
     ]
   },
   {
-    label: 'Herramientas'
+    label: 'Herramientas',
+    submenu: [
+      {
+        label: 'Nueva ventana de consulta'
+      }
+    ]
   }
 ]
+
+if (isDevelopment === true) {
+  menuTemplate.push({
+    label: 'Ayuda',
+    submenu: [
+      {
+        label: 'Abrir DevTools',
+        click () {
+          win.webContents.openDevTools()
+        }
+      }
+    ]
+  })
+}
 
 const menu = Menu.buildFromTemplate(menuTemplate)
 Menu.setApplicationMenu(menu)
@@ -45,7 +67,7 @@ function createWindow () {
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
+    // if (!process.env.IS_TEST) win.webContents.openDevTools()
   } else {
     createProtocol('app')
     // Load the index.html when not in development
